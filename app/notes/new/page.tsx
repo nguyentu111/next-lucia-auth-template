@@ -3,5 +3,9 @@ import { requiredAuth } from "@/lib/auth";
 
 export default async function page() {
   const { user } = await requiredAuth();
-  return <AddNoteForm userId={user.id} />;
+  return (
+    <>
+      <AddNoteForm userId={user.id} />
+    </>
+  );
 }

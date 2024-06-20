@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import Link from "next/link";
 
 export default async function NotesLayout({ children }: any) {
-  const { user } = await requiredAuth("/notes");
+  const { user, session } = await requiredAuth("/notes");
   const data = await db.note.findMany({ where: { userId: user.id } });
   return (
     <div className="flex h-full min-h-screen flex-col">

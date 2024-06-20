@@ -2,6 +2,7 @@
 import { deleteNote } from "@/models/note.server";
 import { UserWithoutPass } from "@/types";
 import { Note, User } from "@prisma/client";
+import { headers } from "next/headers";
 import { useRouter } from "next/navigation";
 
 export const NoteDetail = ({
@@ -16,11 +17,13 @@ export const NoteDetail = ({
     await deleteNote({ id: data.id, userId: user.id });
     router.push("/notes");
   };
+
   if (!data) return "not found";
   return (
     <div>
       <h3 className="text-2xl font-bold">{data.title}</h3>
       <p className="py-6">{data.body}</p>
+
       <hr className="my-4" />
       <form action={handleDelete}>
         <button

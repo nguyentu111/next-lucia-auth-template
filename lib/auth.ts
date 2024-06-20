@@ -5,7 +5,11 @@ import { cache } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { UserWithoutPass } from "@/types";
-
+import { GitHub } from "arctic";
+export const github = new GitHub(
+  process.env.GITHUB_CLIENT_ID as string,
+  process.env.GITHUB_CLIENT_SECRET as string
+);
 export const lucia = new Lucia(adapter, {
   sessionCookie: {
     expires: false,
@@ -19,6 +23,7 @@ export const lucia = new Lucia(adapter, {
       // attributes has the type of DatabaseUserAttributes
       username: user.username,
       id: user.id,
+      githubId: attributes.github_id,
     };
   },
 });
@@ -32,6 +37,7 @@ declare module "lucia" {
 
 interface DatabaseUserAttributes {
   username: string;
+  github_id?: number;
 }
 
 export const auth = cache(

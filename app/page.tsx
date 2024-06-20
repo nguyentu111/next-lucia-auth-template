@@ -1,8 +1,9 @@
+import { auth } from "@/lib/auth";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function Home() {
-  const user: null | { email: string } = null;
+export default async function Home() {
+  const { user } = await auth();
   return (
     <main className="relative min-h-screen bg-white sm:flex sm:items-center sm:justify-center">
       <div className="relative sm:pb-16 sm:pt-8">
@@ -32,7 +33,7 @@ export default function Home() {
                     href="/notes"
                     className="flex items-center justify-center rounded-md border border-transparent bg-white px-4 py-3 text-base font-medium text-yellow-700 shadow-sm hover:bg-yellow-50 sm:px-8"
                   >
-                    View Notes for {user.email}
+                    View Notes for {user.username}
                   </Link>
                 ) : (
                   <div className="space-y-4 sm:mx-auto sm:inline-grid sm:grid-cols-2 sm:gap-5 sm:space-y-0">

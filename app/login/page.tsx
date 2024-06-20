@@ -17,6 +17,10 @@ export default function LoginPage() {
     const rs = await login(data);
     rs.error && setError(rs.error);
   };
+  const handleGGLogin = async () => {
+    const rs = await fetch("/api/login/github");
+    console.log("login gg ", rs.json());
+  };
   return (
     <div className="flex min-h-full flex-col justify-center">
       <div className="mx-auto w-full max-w-md px-8">
@@ -116,6 +120,14 @@ export default function LoginPage() {
             </div>
           </div>
         </form>
+        <div className="mt-4">
+          <a
+            href="/api/login/github"
+            className="block text-center hover:bg-gray-200 transition-all w-full rounded border border-gray-500 px-2 py-1 text-lg"
+          >
+            Login with github{" "}
+          </a>
+        </div>
       </div>
     </div>
   );
