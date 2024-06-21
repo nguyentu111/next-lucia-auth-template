@@ -2,11 +2,11 @@
 import { signup } from "@/actions";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useRef, useState } from "react";
+import { Suspense, useRef, useState } from "react";
+import { LoginLink } from "./_components/login-link";
+import { RedirectInput } from "./_components/redirect-input";
 
 export default function Join() {
-  const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") ?? undefined;
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
@@ -83,7 +83,9 @@ export default function Join() {
             </div>
           </div>
 
-          <input type="hidden" name="redirectTo" value={redirectTo} />
+          <Suspense>
+            <RedirectInput />
+          </Suspense>
           <button
             type="submit"
             className="w-full rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:bg-blue-400"
@@ -92,16 +94,10 @@ export default function Join() {
           </button>
           <div className="flex items-center justify-center">
             <div className="text-center text-sm text-gray-500">
-              Already have an account?{" "}
-              <Link
-                className="text-blue-500 underline"
-                href={{
-                  pathname: "/login",
-                  search: searchParams.toString(),
-                }}
-              >
-                Log in
-              </Link>
+              Already have an account?
+              <Suspense>
+                <LoginLink />
+              </Suspense>
             </div>
           </div>
         </form>

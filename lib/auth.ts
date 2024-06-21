@@ -84,6 +84,6 @@ export const auth = cache(
 export const requiredAuth = async (redirectTo?: string) => {
   const { user, session } = await auth();
   if (!user || !session)
-    redirect(`${LoginUrl}${redirectTo ? `?redirectTo=${redirectTo}` : ""}`);
+    redirect(`${LoginUrl}${redirectTo ? `?redirect=${redirectTo}` : ""}`);
   else return { user, session };
 };

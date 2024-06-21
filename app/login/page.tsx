@@ -2,11 +2,12 @@
 import { login } from "@/actions";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useRef, useState } from "react";
+import { Suspense, useRef, useState } from "react";
+import { SignUpLink } from "./_components.tsx/signup-link";
+import { GithubLoginLink } from "./_components.tsx/github-login-link";
+import { RedirectInput } from "./_components.tsx/redirect-input";
 
 export default function LoginPage() {
-  const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") || "";
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
@@ -75,8 +76,9 @@ export default function LoginPage() {
               ) : null}
             </div>
           </div>
-
-          <input type="hidden" name="redirect" value={redirect} />
+          <Suspense>
+            <RedirectInput />
+          </Suspense>
           {error?.all ? (
             <div className="text-red-700" id="all-error">
               {error.all}
@@ -104,26 +106,17 @@ export default function LoginPage() {
               </label>
             </div>
             <div className="text-center text-sm text-gray-500">
-              Don&apos;t have an account?{" "}
-              <Link
-                className="text-blue-500 underline"
-                href={{
-                  pathname: "/join",
-                  search: searchParams.toString(),
-                }}
-              >
-                Sign up
-              </Link>
+              Don&apos;t have an account?
+              <Suspense>
+                <SignUpLink />
+              </Suspense>
             </div>
           </div>
         </form>
         <div className="mt-4">
-          <a
-            href={`/api/login/github${redirect ? `?redirect=${redirect}` : ""}`}
-            className="block text-center hover:bg-gray-200 transition-all w-full rounded border border-gray-500 px-2 py-1 text-lg"
-          >
-            Login with github{" "}
-          </a>
+          <Suspense>
+            <GithubLoginLink />
+          </Suspense>
         </div>
       </div>
     </div>

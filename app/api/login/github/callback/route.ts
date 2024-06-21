@@ -5,10 +5,11 @@ import { generateIdFromEntropySize } from "lucia";
 import { parseCookies } from "oslo/cookie";
 import { type NextRequest } from "next/server";
 import { safeRedirect } from "@/lib/utils";
+import { RedirectSearchKey } from "@/contants";
 export async function GET(request: NextRequest) {
   const cookies = parseCookies(request.headers.get("Cookie") ?? "");
   const stateCookie = cookies.get("github_oauth_state") ?? null;
-  const redirect = safeRedirect(cookies.get("redirect"));
+  const redirect = safeRedirect(cookies.get(RedirectSearchKey));
   const url = new URL(request.url);
   const state = url.searchParams.get("state");
   const code = url.searchParams.get("code");
@@ -37,7 +38,6 @@ export async function GET(request: NextRequest) {
     if (existingUser) {
       const session = await lucia.createSession(existingUser.id, {});
       const sessionCookie = lucia.createSessionCookie(session.id);
-      console.log("serialize: ", sessionCookie.serialize());
       return new Response(null, {
         status: 302,
         headers: {
@@ -66,7 +66,6 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (e) {
-    console.log(e);
     if (e instanceof OAuth2RequestError) {
       // bad verification code, invalid credentials, etc
       return new Response(null, {

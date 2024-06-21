@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { LoginUrl, LuciaSessionName, PrivateUrl } from "@/contants";
-import { useAuth } from "./providers/auth-provider";
-import { auth, lucia } from "./lib/auth";
 import { cookies } from "next/headers";
 
 export const config = {

@@ -7,7 +7,7 @@ import { generateIdFromEntropySize } from "lucia";
 import { ActionResult } from "@/types";
 import { hash, compare } from "bcryptjs";
 import { createUser } from "@/models/user.server";
-import { DefaultRedirect } from "@/contants";
+import { DefaultRedirect, RedirectSearchKey } from "@/contants";
 import { safeRedirect } from "@/lib/utils";
 
 export async function signup(
@@ -121,7 +121,7 @@ export async function login(
     sessionCookie.value,
     sessionCookie.attributes
   );
-  const redirectTo = formData.get("redirectTo") as string;
+  const redirectTo = formData.get(RedirectSearchKey) as string;
   return redirectTo
     ? redirect(safeRedirect(redirectTo))
     : redirect(DefaultRedirect);
