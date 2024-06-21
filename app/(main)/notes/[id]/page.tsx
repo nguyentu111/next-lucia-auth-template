@@ -8,5 +8,5 @@ export default async function page({ params }: any) {
     where: { userId: user.id, id: params.id },
   });
   if (!data) return "not found";
-  return <NoteDetail data={data} user={user} />;
+  return <NoteDetail data={data} />;
 }

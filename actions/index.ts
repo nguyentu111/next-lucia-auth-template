@@ -7,6 +7,8 @@ import { generateIdFromEntropySize } from "lucia";
 import { ActionResult } from "@/types";
 import { hash, compare } from "bcryptjs";
 import { createUser } from "@/models/user.server";
+import { DefaultRedirect } from "@/contants";
+import { safeRedirect } from "@/lib/utils";
 
 export async function signup(
   formData: FormData
@@ -44,7 +46,12 @@ export async function signup(
 
   // TODO: check if username is already used
 
-  await createUser({ id: userId, username, password_hash: passwordHash });
+  await createUser({
+    id: userId,
+    username,
+    password_hash: passwordHash,
+    github_id: null,
+  });
 
   const session = await lucia.createSession(userId, {});
   const sessionCookie = lucia.createSessionCookie(session.id);
@@ -53,7 +60,7 @@ export async function signup(
     sessionCookie.value,
     sessionCookie.attributes
   );
-  return redirect("/notes");
+  return redirect(DefaultRedirect);
 }
 
 export async function login(
@@ -85,7 +92,7 @@ export async function login(
   }
 
   const existingUser = await db.user.findFirst({ where: { username } });
-  if (!existingUser) {
+  if (!existingUser || (existingUser && !existingUser.password_hash)) {
     // NOTE:
     // Returning immediately allows malicious actors to figure out valid usernames from response times,
     // allowing them to only focus on guessing passwords in brute-force attacks.
@@ -100,7 +107,7 @@ export async function login(
     };
   }
 
-  const validPassword = await compare(password, existingUser.password_hash);
+  const validPassword = await compare(password, existingUser.password_hash!);
   if (!validPassword) {
     return {
       error: { all: "Incorrect username or password" },
@@ -115,7 +122,9 @@ export async function login(
     sessionCookie.attributes
   );
   const redirectTo = formData.get("redirectTo") as string;
-  return redirectTo ? redirect(redirectTo) : redirect("/notes");
+  return redirectTo
+    ? redirect(safeRedirect(redirectTo))
+    : redirect(DefaultRedirect);
 }
 export async function logout() {
   const { session } = await auth();

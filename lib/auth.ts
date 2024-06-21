@@ -1,17 +1,25 @@
 import { Lucia, Session, User as LuciaUser } from "lucia";
-import { adapter } from "./db";
+import { PrismaAdapter } from "@lucia-auth/adapter-prisma";
+
 import { User } from "@prisma/client";
 import { cache } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { UserWithoutPass } from "@/types";
 import { GitHub } from "arctic";
-export const github = new GitHub(
-  process.env.GITHUB_CLIENT_ID as string,
-  process.env.GITHUB_CLIENT_SECRET as string
-);
+import { LoginUrl, LuciaSessionName } from "@/contants";
+import { db } from "./db";
+export const github = (redirectURI?: string) =>
+  new GitHub(
+    process.env.GITHUB_CLIENT_ID as string,
+    process.env.GITHUB_CLIENT_SECRET as string,
+    { redirectURI }
+  );
+const adapter = new PrismaAdapter(db.session, db.user);
+
 export const lucia = new Lucia(adapter, {
   sessionCookie: {
+    name: LuciaSessionName,
     expires: false,
     attributes: {
       secure: process.env.NODE_ENV === "production",
@@ -52,7 +60,6 @@ export const auth = cache(
       };
     }
     const result = await lucia.validateSession(sessionId);
-    // next.js throws when you attempt to set cookie when rendering page
     try {
       if (result.session && result.session.fresh) {
         const sessionCookie = lucia.createSessionCookie(result.session.id);
@@ -77,6 +84,6 @@ export const auth = cache(
 export const requiredAuth = async (redirectTo?: string) => {
   const { user, session } = await auth();
   if (!user || !session)
-    redirect(`/login${redirectTo ? `?redirectTo=${redirectTo}` : ""}`);
+    redirect(`${LoginUrl}${redirectTo ? `?redirectTo=${redirectTo}` : ""}`);
   else return { user, session };
 };

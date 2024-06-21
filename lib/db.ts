@@ -1,4 +1,3 @@
-import { PrismaAdapter } from "@lucia-auth/adapter-prisma";
 import { PrismaClient } from "@prisma/client";
 
 const prismaClientSingleton = () => {
@@ -13,5 +12,4 @@ const db = globalThis.prismaGlobal ?? prismaClientSingleton();
 
 if (process.env.NODE_ENV !== "production") globalThis.prismaGlobal = db;
 
-const adapter = new PrismaAdapter(db.session, db.user);
-export { db, adapter };
+export { db };

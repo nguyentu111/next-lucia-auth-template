@@ -2,11 +2,11 @@
 import { login } from "@/actions";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") || "/notes";
+  const redirect = searchParams.get("redirect") || "";
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
@@ -17,10 +17,7 @@ export default function LoginPage() {
     const rs = await login(data);
     rs.error && setError(rs.error);
   };
-  const handleGGLogin = async () => {
-    const rs = await fetch("/api/login/github");
-    console.log("login gg ", rs.json());
-  };
+
   return (
     <div className="flex min-h-full flex-col justify-center">
       <div className="mx-auto w-full max-w-md px-8">
@@ -79,7 +76,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <input type="hidden" name="redirectTo" value={redirectTo} />
+          <input type="hidden" name="redirect" value={redirect} />
           {error?.all ? (
             <div className="text-red-700" id="all-error">
               {error.all}
@@ -122,7 +119,7 @@ export default function LoginPage() {
         </form>
         <div className="mt-4">
           <a
-            href="/api/login/github"
+            href={`/api/login/github${redirect ? `?redirect=${redirect}` : ""}`}
             className="block text-center hover:bg-gray-200 transition-all w-full rounded border border-gray-500 px-2 py-1 text-lg"
           >
             Login with github{" "}

@@ -3,11 +3,12 @@ import { github, lucia } from "@/lib/auth";
 import { OAuth2RequestError } from "arctic";
 import { generateIdFromEntropySize } from "lucia";
 import { parseCookies } from "oslo/cookie";
-
-export async function GET(request: Request) {
+import { type NextRequest } from "next/server";
+import { safeRedirect } from "@/lib/utils";
+export async function GET(request: NextRequest) {
   const cookies = parseCookies(request.headers.get("Cookie") ?? "");
   const stateCookie = cookies.get("github_oauth_state") ?? null;
-
+  const redirect = safeRedirect(cookies.get("redirect"));
   const url = new URL(request.url);
   const state = url.searchParams.get("state");
   const code = url.searchParams.get("code");
@@ -20,7 +21,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const tokens = await github.validateAuthorizationCode(code);
+    const tokens = await github().validateAuthorizationCode(code);
     const githubUserResponse = await fetch("https://api.github.com/user", {
       headers: {
         Authorization: `Bearer ${tokens.accessToken}`,
@@ -36,10 +37,11 @@ export async function GET(request: Request) {
     if (existingUser) {
       const session = await lucia.createSession(existingUser.id, {});
       const sessionCookie = lucia.createSessionCookie(session.id);
+      console.log("serialize: ", sessionCookie.serialize());
       return new Response(null, {
         status: 302,
         headers: {
-          Location: "/",
+          Location: redirect,
           "Set-Cookie": sessionCookie.serialize(),
         },
       });
@@ -59,7 +61,7 @@ export async function GET(request: Request) {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: "/",
+        Location: redirect,
         "Set-Cookie": sessionCookie.serialize(),
       },
     });

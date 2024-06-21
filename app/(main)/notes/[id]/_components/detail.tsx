@@ -1,17 +1,11 @@
 "use client";
 import { deleteNote } from "@/models/note.server";
-import { UserWithoutPass } from "@/types";
-import { Note, User } from "@prisma/client";
-import { headers } from "next/headers";
+import { useRequiredAuth } from "@/providers/auth-provider";
+import { Note } from "@prisma/client";
 import { useRouter } from "next/navigation";
 
-export const NoteDetail = ({
-  data,
-  user,
-}: {
-  data: Note;
-  user: UserWithoutPass;
-}) => {
+export const NoteDetail = ({ data }: { data: Note }) => {
+  const { user } = useRequiredAuth();
   const router = useRouter();
   const handleDelete = async () => {
     await deleteNote({ id: data.id, userId: user.id });
